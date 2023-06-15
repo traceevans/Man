@@ -1,17 +1,26 @@
-#colbeamMan, #lightningBolt {
-    font-size: 2em;
+#game {
+    height: 500px;
+    width: 800px;
+    border: 1px solid black;
+    position: relative;
+    overflow: hidden;
 }
 
-#jumpButton {
-    width: 100%;
+#player {
+    width: 50px;
     height: 50px;
+    position: absolute;
+    bottom: 0px;
+    background-image: url('beardedMan.png');
+    background-size: cover;
 }
 
-#gameOverText {
+#obstacle {
+    width: 50px;
+    height: 100px;
     position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 3em;
-    color: red;
+    right: 0px;
+    bottom: 0px;
+    background-image: url('steelBeam.png');
+    background-size: cover;
 }
