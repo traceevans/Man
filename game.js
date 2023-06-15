@@ -1,66 +1,61 @@
-var character = document.getElementById('character');
+var player = document.getElementById('player');
 var obstacle = document.getElementById('obstacle');
-var scoreElement = document.getElementById('score');
-var gameOverText = document.getElementById('gameOverText');
-var restartButton = document.getElementById('restartButton');
 
-var gameInterval;
-var score = 0;
+var playerJumping = false;
+var playerBottom = 0;
+var obstacleLeft = 500;
+var gameActive = false;
+
+function jump() {
+    if (!playerJumping && gameActive) {
+        playerJumping = true;
+        playerBottom = 50;
+        player.style.bottom = playerBottom + 'px';
+        setTimeout(function() {
+            playerJumping = false;
+            playerBottom = 0;
+            player.style.bottom = playerBottom + 'px';
+        }, 500);
+    }
+}
+
+document.addEventListener('keydown', function(event) {
+    if (event.key === ' ' || event.key === 'ArrowUp') {
+        jump();
+    } else if (event.key === 's') {
+        startGame();
+    } else if (event.key === 'r') {
+        resetGame();
+    }
+});
 
 function startGame() {
-    gameInterval = setInterval(gameLoop, 20);
+    gameActive = true;
 }
 
-function gameLoop() {
-    var characterRect = character.getBoundingClientRect();
-    var obstacleRect = obstacle.getBoundingClientRect();
+function resetGame() {
+    gameActive = false;
+    playerBottom = 0;
+    player.style.bottom = playerBottom + 'px';
+    obstacleLeft = 500;
+    obstacle.style.right = obstacleLeft + 'px';
+}
 
-    // Move character up if mouse is down, otherwise move character down
-    if (mouseIsDown) {
-        character.style.bottom = (characterRect.bottom + 1) + 'px';
-    } else {
-        character.style.bottom = (characterRect.bottom - 1) + 'px';
+function updateGameArea() {
+    if (gameActive) {
+        obstacleLeft -= 2;
+        obstacle.style.right = obstacleLeft + 'px';
+
+        if (obstacleLeft < 0) {
+            obstacleLeft = 500;
+        }
+
+        if (obstacleLeft > 450 && obstacleLeft < 500 && playerBottom === 0) {
+            gameActive = false;
+            alert('Game Over');
+        }
     }
-
-    // Move obstacle to the left
-    obstacle.style.right = (obstacleRect.right + 1) + 'px';
-
-    // Check for collision between character and obstacle
-    if (characterRect.right > obstacleRect.left && characterRect.left < obstacleRect.right &&
-        characterRect.bottom > obstacleRect.top && characterRect.top < obstacleRect.bottom) {
-        endGame();
-    }
-
-    // Increase score
-    score++;
-    scoreElement.innerText = 'Score: ' + score;
 }
 
-function endGame() {
-    clearInterval(gameInterval);
-    gameOverText.style.display = 'block';
-    restartButton.style.display = 'block';
-}
-
-function restartGame() {
-    character.style.bottom = '50px';
-    obstacle.style.right = '0px';
-    score = 0;
-    scoreElement.innerText = 'Score: ' + score;
-    gameOverText.style.display = 'none';
-    restartButton.style.display = 'none';
-    startGame();
-}
-
-var mouseIsDown = false;
-
-document.body.onmousedown = function() {
-  mouseIsDown = true;
-};
-
-document.body.onmouseup = function() {
-  mouseIsDown = false;
-};
-
-restartButton.onclick = restartGame;
+setInterval(updateGameArea, 20);
 
