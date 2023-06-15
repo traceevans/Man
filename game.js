@@ -1,40 +1,66 @@
-var player = document.getElementById('player');
+var character = document.getElementById('character');
 var obstacle = document.getElementById('obstacle');
+var scoreElement = document.getElementById('score');
+var gameOverText = document.getElementById('gameOverText');
+var restartButton = document.getElementById('restartButton');
 
-var playerJumping = false;
-var playerBottom = 0;
-var obstacleLeft = 500;
+var gameInterval;
+var score = 0;
 
-function jump() {
-    if (!playerJumping) {
-        playerJumping = true;
-        playerBottom = 50;
-        player.style.bottom = playerBottom + 'px';
-        setTimeout(function() {
-            playerJumping = false;
-            playerBottom = 0;
-            player.style.bottom = playerBottom + 'px';
-        }, 500);
-    }
+function startGame() {
+    gameInterval = setInterval(gameLoop, 20);
 }
 
-document.addEventListener('keydown', function(event) {
-    if (event.key === ' ' || event.key === 'ArrowUp') {
-        jump();
-    }
-});
+function gameLoop() {
+    var characterRect = character.getBoundingClientRect();
+    var obstacleRect = obstacle.getBoundingClientRect();
 
-function updateGameArea() {
-    obstacleLeft -= 2;
-    obstacle.style.right = obstacleLeft + 'px';
-
-    if (obstacleLeft < 0) {
-        obstacleLeft = 500;
+    // Move character up if mouse is down, otherwise move character down
+    if (mouseIsDown) {
+        character.style.bottom = (characterRect.bottom + 1) + 'px';
+    } else {
+        character.style.bottom = (characterRect.bottom - 1) + 'px';
     }
 
-    if (obstacleLeft > 450 && obstacleLeft < 500 && playerBottom === 0) {
-        alert('Game Over');
+    // Move obstacle to the left
+    obstacle.style.right = (obstacleRect.right + 1) + 'px';
+
+    // Check for collision between character and obstacle
+    if (characterRect.right > obstacleRect.left && characterRect.left < obstacleRect.right &&
+        characterRect.bottom > obstacleRect.top && characterRect.top < obstacleRect.bottom) {
+        endGame();
     }
+
+    // Increase score
+    score++;
+    scoreElement.innerText = 'Score: ' + score;
 }
 
-setInterval(updateGameArea, 20);
+function endGame() {
+    clearInterval(gameInterval);
+    gameOverText.style.display = 'block';
+    restartButton.style.display = 'block';
+}
+
+function restartGame() {
+    character.style.bottom = '50px';
+    obstacle.style.right = '0px';
+    score = 0;
+    scoreElement.innerText = 'Score: ' + score;
+    gameOverText.style.display = 'none';
+    restartButton.style.display = 'none';
+    startGame();
+}
+
+var mouseIsDown = false;
+
+document.body.onmousedown = function() {
+  mouseIsDown = true;
+};
+
+document.body.onmouseup = function() {
+  mouseIsDown = false;
+};
+
+restartButton.onclick = restartGame;
+
