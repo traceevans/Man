@@ -1,36 +1,40 @@
-let colbeamMan = document.getElementById('colbeamMan');
-let lightningBolt = document.getElementById('lightningBolt');
-let jumpButton = document.getElementById('jumpButton');
-let gameOverText = document.getElementById('gameOverText');
+var player = document.getElementById('player');
+var obstacle = document.getElementById('obstacle');
 
-let isJumping = false;
+var playerJumping = false;
+var playerBottom = 0;
+var obstacleLeft = 500;
 
-jumpButton.addEventListener('click', function() {
-    if (!isJumping) {
-        isJumping = true;
-        colbeamMan.style.bottom = '200px';
-
+function jump() {
+    if (!playerJumping) {
+        playerJumping = true;
+        playerBottom = 50;
+        player.style.bottom = playerBottom + 'px';
         setTimeout(function() {
-            colbeamMan.style.bottom = '50px';
-            isJumping = false;
-        }, 1000);
+            playerJumping = false;
+            playerBottom = 0;
+            player.style.bottom = playerBottom + 'px';
+        }, 500);
+    }
+}
+
+document.addEventListener('keydown', function(event) {
+    if (event.key === ' ' || event.key === 'ArrowUp') {
+        jump();
     }
 });
 
-setInterval(function() {
-    let colbeamManRect = colbeamMan.getBoundingClientRect();
-    let lightningBoltRect = lightningBolt.getBoundingClientRect();
+function updateGameArea() {
+    obstacleLeft -= 2;
+    obstacle.style.right = obstacleLeft + 'px';
 
-    if (lightningBoltRect.left < colbeamManRect.right &&
-        lightningBoltRect.right > colbeamManRect.left &&
-        lightningBoltRect.bottom > colbeamManRect.top &&
-        lightningBoltRect.top < colbeamManRect.bottom) {
-        gameOverText.style.display = 'block';
+    if (obstacleLeft < 0) {
+        obstacleLeft = 500;
     }
 
-    lightningBolt.style.right = parseInt(lightningBolt.style.right) + 5 + 'px';
-
-    if (parseInt(lightningBolt.style.right) > window.innerWidth) {
-        lightningBolt.style.right = '0px';
+    if (obstacleLeft > 450 && obstacleLeft < 500 && playerBottom === 0) {
+        alert('Game Over');
     }
-}, 20);
+}
+
+setInterval(updateGameArea, 20);
